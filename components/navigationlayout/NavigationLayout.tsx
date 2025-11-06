@@ -11,6 +11,11 @@ export default function NavigationLayout({
 }>) {
   const pathname = usePathname();
 
+  // No mostrar el layout en login ("/") ni en registro ("/register")
+  if (pathname === "/" || pathname === "/register") {
+    return <>{children}</>;
+  }
+
   const navItems = [
     { href: "/dashboard", icon: <FaHome />, label: "Inicio" },
     { href: "/search", icon: <FaSearch />, label: "Buscar" },
@@ -43,6 +48,7 @@ export default function NavigationLayout({
         </nav>
       </aside>
 
+      {/* Contenido principal */}
       <main className="flex-1 overflow-y-auto p-4 md:p-8 md:ml-64 bg-gray-50 dark:bg-gray-950">
         {children}
       </main>

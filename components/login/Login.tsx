@@ -59,7 +59,7 @@ export default function Login() {
         <div className="text-center text-sm text-gray-600">
           ¿No tenés cuenta?{" "}
           <button
-            onClick={() => router.push("auth/register")}
+            onClick={() => router.push("/register")}
             className="text-blue-500 hover:underline cursor-pointer"
           >
             Registrate
