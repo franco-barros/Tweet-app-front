@@ -1,7 +1,9 @@
 "use client";
 
-import { useState, FC, useRef, useEffect } from "react";
-import { FaPaperPlane, FaTimes } from "react-icons/fa";
+import { FC, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
+import { FaTimes } from "react-icons/fa";
+import { ConversationView } from "./ConversationView";
 
 interface Message {
   id: number;
@@ -17,7 +19,7 @@ interface ConversationProps {
   messages: Message[];
   markAsRead: (id: number) => void;
   sendMessage: (text: string) => void;
-  onClose?: () => void;
+  onClose: () => void;
 }
 
 const Conversation: FC<ConversationProps> = ({
@@ -28,72 +30,46 @@ const Conversation: FC<ConversationProps> = ({
   sendMessage,
   onClose,
 }) => {
-  const [newMessage, setNewMessage] = useState("");
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
+  const hasMarkedRead = useRef(false);
 
+  // ✅ Evita loops de render
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+    if (!hasMarkedRead.current) {
+      markAsRead(conversationId);
+      hasMarkedRead.current = true;
+    }
+  }, [conversationId, markAsRead]);
 
-  const handleSend = () => {
-    if (newMessage.trim() === "") return;
-    sendMessage(newMessage.trim());
-    setNewMessage("");
+  const handleGoToProfile = () => {
+    router.push(`/perfil/${conversationId}`);
   };
 
   return (
-    <div className="flex flex-col w-full md:w-1/2 bg-white dark:bg-gray-900 rounded-xl shadow-lg p-4">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-bold">{conversationName}</h2>
-        {onClose && (
-          <button
-            onClick={onClose}
-            className="text-gray-500 hover:text-red-500"
-          >
-            <FaTimes />
-          </button>
-        )}
-      </div>
-
-      {/* Mensajes */}
-      <div className="flex-1 overflow-y-auto space-y-2 mb-4">
-        {messages.map((msg) => (
-          <div
-            key={msg.id}
-            className={`p-2 rounded-md max-w-[70%] ${
-              msg.sender === "yo"
-                ? "bg-blue-500 text-white ml-auto"
-                : "bg-gray-200 dark:bg-gray-800 text-gray-900 dark:text-gray-100"
-            }`}
-          >
-            <p>{msg.text}</p>
-            <small className="text-xs text-gray-500">
-              {new Date(msg.date).toLocaleTimeString([], {
-                hour: "2-digit",
-                minute: "2-digit",
-              })}
-            </small>
-          </div>
-        ))}
-        <div ref={messagesEndRef} />
-      </div>
-
-      <div className="flex gap-2">
-        <input
-          type="text"
-          value={newMessage}
-          onChange={(e) => setNewMessage(e.target.value)}
-          placeholder="Escribir mensaje..."
-          className="flex-1 rounded-md border border-gray-300 dark:border-gray-700 px-3 py-2 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          onKeyDown={(e) => e.key === "Enter" && handleSend()}
-        />
+    <div className="flex flex-col w-full h-full bg-white dark:bg-gray-900 rounded-xl shadow-lg overflow-hidden">
+      {/* 🔹 Header */}
+      <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-700">
         <button
-          onClick={handleSend}
-          className="px-3 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+          type="button"
+          onClick={handleGoToProfile}
+          onKeyDown={(e) => e.key === "Enter" && handleGoToProfile()}
+          className="text-lg font-bold text-left cursor-pointer hover:text-blue-500 transition-colors bg-transparent border-none focus:outline-none focus:ring-2 focus:ring-blue-400 dark:focus:ring-blue-500"
         >
-          <FaPaperPlane />
+          {conversationName}
+        </button>
+
+        <button
+          type="button"
+          onClick={onClose}
+          className="text-gray-500 hover:text-red-500 transition-colors focus:outline-none focus:ring-2 focus:ring-red-400 dark:focus:ring-red-600 rounded-full p-1"
+          aria-label="Cerrar conversación"
+        >
+          <FaTimes />
         </button>
       </div>
+
+      {/* 🔹 Contenido */}
+      <ConversationView messages={messages} sendMessage={sendMessage} />
     </div>
   );
 };

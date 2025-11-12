@@ -1,8 +1,7 @@
 "use client";
 
-import { useState, FC } from "react";
-import { useSwipeable } from "react-swipeable";
-import { FaTimes, FaSearch } from "react-icons/fa";
+import { useState } from "react";
+import { MessagesList } from "./messageslist";
 import { Conversation } from "./conversation";
 
 interface Message {
@@ -13,225 +12,126 @@ interface Message {
   read: boolean;
 }
 
-const initialMessages: Message[] = [
+interface ConversationItem {
+  id: number;
+  name: string;
+  messages: Message[];
+}
+
+const initialConversations: ConversationItem[] = [
   {
     id: 1,
-    sender: "ana_123",
-    text: "Hola, ¿cómo estás?",
-    date: new Date().toISOString(),
-    read: false,
+    name: "Juan Pérez",
+    messages: [
+      {
+        id: 1,
+        sender: "Juan Pérez",
+        text: "Hola, ¿cómo estás?",
+        date: new Date().toISOString(),
+        read: true,
+      },
+      {
+        id: 2,
+        sender: "yo",
+        text: "Todo bien, ¿vos?",
+        date: new Date().toISOString(),
+        read: true,
+      },
+    ],
   },
   {
     id: 2,
-    sender: "miguel_dev",
-    text: "Te pasé los archivos que pediste.",
-    date: new Date(Date.now() - 86400000).toISOString(),
-    read: true,
-  },
-  {
-    id: 3,
-    sender: "lucia89",
-    text: "Nos vemos mañana en la reunión.",
-    date: new Date(Date.now() - 86400000 * 3).toISOString(),
-    read: false,
-  },
-  {
-    id: 4,
-    sender: "fran_barros",
-    text: "Gracias por la info!",
-    date: new Date(Date.now() - 86400000 * 10).toISOString(),
-    read: true,
+    name: "María Gómez",
+    messages: [
+      {
+        id: 1,
+        sender: "María Gómez",
+        text: "¿Te queda cómodo mañana?",
+        date: new Date().toISOString(),
+        read: false,
+      },
+    ],
   },
 ];
 
-interface MessageItemProps {
-  message: Message;
-  markAsRead: (id: number) => void;
-  deleteMessage: (id: number) => void;
-  onSelect: (message: Message) => void;
-}
+export default function Messages() {
+  const [conversations, setConversations] =
+    useState<ConversationItem[]>(initialConversations);
+  const [selectedConversationId, setSelectedConversationId] = useState<
+    number | null
+  >(null);
 
-const MessageItem: FC<MessageItemProps> = ({
-  message,
-  markAsRead,
-  deleteMessage,
-  onSelect,
-}) => {
-  const [swiped, setSwiped] = useState(false);
-  const handlers = useSwipeable({
-    onSwipedLeft: () => setSwiped(true),
-    onSwipedRight: () => setSwiped(false),
-    trackMouse: true,
-  });
+  const selectedConversation =
+    conversations.find((c) => c.id === selectedConversationId) || null;
 
-  return (
-    <li
-      {...handlers}
-      className="relative overflow-hidden rounded-lg"
-      onClick={() => onSelect(message)}
-    >
-      <div
-        className={`flex items-center justify-between p-3 transition-transform transform w-full text-left cursor-pointer ${
-          message.read
-            ? "bg-gray-100 dark:bg-gray-800"
-            : "bg-blue-50 dark:bg-blue-900/30 font-semibold"
-        } ${
-          swiped ? "-translate-x-24" : "translate-x-0"
-        } md:translate-x-0 hover:bg-gray-200 dark:hover:bg-gray-700`}
-      >
-        <div className="flex flex-col gap-1">
-          <span className="font-semibold text-gray-900 dark:text-gray-100">
-            {message.sender}
-          </span>
-          <span className="text-gray-800 dark:text-gray-200">
-            {message.text}
-          </span>
-        </div>
-        <div className="hidden md:flex gap-2">
-          {!message.read && (
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                markAsRead(message.id);
-              }}
-              className="text-sm text-blue-500 hover:underline cursor-pointer"
-            >
-              Marcar como leído
-            </button>
-          )}
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              deleteMessage(message.id);
-            }}
-            className="text-gray-400 hover:text-red-500 cursor-pointer"
-          >
-            <FaTimes />
-          </button>
-        </div>
-      </div>
-    </li>
-  );
-};
+  // ==========================
+  // 🔹 Helpers
+  // ==========================
 
-const Messages: FC = () => {
-  const [messages, setMessages] = useState<Message[]>(initialMessages);
-  const [search, setSearch] = useState("");
-  const [activeTab, setActiveTab] = useState<"Mensajes" | "Solicitudes">(
-    "Mensajes"
-  );
-  const [selectedConversation, setSelectedConversation] =
-    useState<Message | null>(null);
-
-  const markAsRead = (id: number) =>
-    setMessages((prev) =>
-      prev.map((m) => (m.id === id ? { ...m, read: true } : m))
+  const updateConversation = (id: number, updatedMessages: Message[]) => {
+    setConversations((prev) =>
+      prev.map((c) => (c.id === id ? { ...c, messages: updatedMessages } : c))
     );
-  const deleteMessage = (id: number) =>
-    setMessages((prev) => prev.filter((m) => m.id !== id));
+  };
 
-  const filteredMessages = messages.filter(
-    (m) =>
-      m.sender.toLowerCase().includes(search.toLowerCase()) ||
-      m.text.toLowerCase().includes(search.toLowerCase())
-  );
+  const markMessagesAsRead = (messages: Message[]) =>
+    messages.map((m) => ({ ...m, read: true }));
 
-  const sendMessage = (text: string) => {
+  // ==========================
+  // 🔹 Handlers
+  // ==========================
+
+  const handleSelectConversation = (id: number) => {
+    const conv = conversations.find((c) => c.id === id);
+    if (!conv) return;
+    const updatedMessages = markMessagesAsRead(conv.messages);
+    updateConversation(id, updatedMessages);
+    setSelectedConversationId(id);
+  };
+
+  const handleCloseConversation = () => setSelectedConversationId(null);
+
+  const handleSendMessage = (text: string) => {
     if (!selectedConversation) return;
-    const newMsg: Message = {
+
+    const newMessage: Message = {
       id: Date.now(),
       sender: "yo",
       text,
       date: new Date().toISOString(),
       read: true,
     };
-    setMessages((prev) =>
-      prev.map((m) =>
-        m.id === selectedConversation.id
-          ? { ...m, text: `${m.text}\n${text}` }
-          : m
-      )
-    );
+
+    const updatedMessages = [...selectedConversation.messages, newMessage];
+    updateConversation(selectedConversation.id, updatedMessages);
   };
 
+  // ==========================
+  // 🔹 Render
+  // ==========================
+
   return (
-    <div className="flex flex-col md:flex-row gap-4 w-full">
-      {!selectedConversation ? (
-        <div className="flex-1 w-full overflow-y-auto p-4 bg-white dark:bg-gray-900 rounded-xl shadow-lg">
-          {/* Header */}
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-bold">mi_cuenta</h2>
-            <div className="flex gap-4">
-              <button
-                type="button"
-                className={`px-3 py-1 rounded-md ${
-                  activeTab === "Mensajes"
-                    ? "bg-blue-500 text-white"
-                    : "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300"
-                }`}
-                onClick={() => setActiveTab("Mensajes")}
-              >
-                Mensajes
-              </button>
-              <button
-                type="button"
-                className={`px-3 py-1 rounded-md ${
-                  activeTab === "Solicitudes"
-                    ? "bg-blue-500 text-white"
-                    : "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300"
-                }`}
-                onClick={() => setActiveTab("Solicitudes")}
-              >
-                Solicitudes
-              </button>
-            </div>
-          </div>
-
-          {/* Buscador */}
-          <div className="flex items-center mb-4 relative">
-            <FaSearch className="absolute left-3 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Buscar mensajes..."
-              className="w-full pl-10 pr-3 py-2 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-          </div>
-
-          {/* Lista de mensajes */}
-          {filteredMessages.length === 0 ? (
-            <p className="text-gray-500 dark:text-gray-400 text-center py-4">
-              No hay mensajes
-            </p>
-          ) : (
-            <ul className="space-y-2">
-              {filteredMessages.map((m) => (
-                <MessageItem
-                  key={m.id}
-                  message={m}
-                  markAsRead={markAsRead}
-                  deleteMessage={deleteMessage}
-                  onSelect={setSelectedConversation}
-                />
-              ))}
-            </ul>
-          )}
-        </div>
-      ) : (
+    <div className="flex flex-col md:flex-row w-full h-screen overflow-hidden bg-gray-100 dark:bg-gray-900">
+      {selectedConversation ? (
         <Conversation
           conversationId={selectedConversation.id}
-          conversationName={selectedConversation.sender}
-          messages={[selectedConversation]}
-          markAsRead={markAsRead}
-          sendMessage={sendMessage}
-          onClose={() => setSelectedConversation(null)}
+          conversationName={selectedConversation.name}
+          messages={selectedConversation.messages}
+          sendMessage={handleSendMessage}
+          markAsRead={() =>
+            updateConversation(
+              selectedConversation.id,
+              markMessagesAsRead(selectedConversation.messages)
+            )
+          }
+          onClose={handleCloseConversation}
+        />
+      ) : (
+        <MessagesList
+          conversations={conversations}
+          onSelect={handleSelectConversation}
         />
       )}
     </div>
   );
-};
-
-export default Messages;
+}
