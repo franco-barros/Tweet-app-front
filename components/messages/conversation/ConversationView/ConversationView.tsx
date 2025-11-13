@@ -22,8 +22,10 @@ const ConversationView: FC<ConversationViewProps> = ({
   sendMessage,
 }) => {
   return (
-    <div className="flex flex-col flex-1 h-full">
-      <ConversationMessages messages={messages} />
+    <div className="flex flex-col h-full overflow-hidden">
+      <div className="flex-1 overflow-y-auto">
+        <ConversationMessages messages={messages} />
+      </div>
       <ConversationInput onSend={sendMessage} />
     </div>
   );

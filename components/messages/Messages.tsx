@@ -64,10 +64,6 @@ export default function Messages() {
   const selectedConversation =
     conversations.find((c) => c.id === selectedConversationId) || null;
 
-  // ==========================
-  // 🔹 Helpers
-  // ==========================
-
   const updateConversation = (id: number, updatedMessages: Message[]) => {
     setConversations((prev) =>
       prev.map((c) => (c.id === id ? { ...c, messages: updatedMessages } : c))
@@ -76,10 +72,6 @@ export default function Messages() {
 
   const markMessagesAsRead = (messages: Message[]) =>
     messages.map((m) => ({ ...m, read: true }));
-
-  // ==========================
-  // 🔹 Handlers
-  // ==========================
 
   const handleSelectConversation = (id: number) => {
     const conv = conversations.find((c) => c.id === id);
@@ -106,31 +98,46 @@ export default function Messages() {
     updateConversation(selectedConversation.id, updatedMessages);
   };
 
-  // ==========================
-  // 🔹 Render
-  // ==========================
-
   return (
-    <div className="flex flex-col md:flex-row w-full h-screen overflow-hidden bg-gray-100 dark:bg-gray-900">
-      {selectedConversation ? (
-        <Conversation
-          conversationId={selectedConversation.id}
-          conversationName={selectedConversation.name}
-          messages={selectedConversation.messages}
-          sendMessage={handleSendMessage}
-          markAsRead={() =>
-            updateConversation(
-              selectedConversation.id,
-              markMessagesAsRead(selectedConversation.messages)
-            )
-          }
-          onClose={handleCloseConversation}
-        />
-      ) : (
-        <MessagesList
-          conversations={conversations}
-          onSelect={handleSelectConversation}
-        />
+    <div className="flex flex-col md:flex-row w-full h-dvh bg-gray-200 dark:bg-gray-950 overflow-hidden">
+      {/* 🔹 Lista de conversaciones */}
+      <div
+        className={`transition-all duration-300 ${
+          selectedConversation ? "hidden md:flex md:w-1/3" : "flex w-full"
+        } flex-col overflow-hidden`}
+      >
+        {/* Contenido con scroll interno */}
+        <div className="flex-1 overflow-y-auto">
+          <MessagesList
+            conversations={conversations}
+            onSelect={handleSelectConversation}
+          />
+        </div>
+      </div>
+
+      {/* 🔹 Conversación */}
+      {selectedConversation && (
+        <div
+          className={`
+          fixed inset-0 z-20 w-full h-full bg-white dark:bg-gray-900
+          md:static md:z-0 md:w-2/3 md:h-full md:rounded-none md:shadow-none
+          flex flex-col overflow-hidden
+        `}
+        >
+          <Conversation
+            conversationId={selectedConversation.id}
+            conversationName={selectedConversation.name}
+            messages={selectedConversation.messages}
+            sendMessage={handleSendMessage}
+            markAsRead={() =>
+              updateConversation(
+                selectedConversation.id,
+                markMessagesAsRead(selectedConversation.messages)
+              )
+            }
+            onClose={handleCloseConversation}
+          />
+        </div>
       )}
     </div>
   );

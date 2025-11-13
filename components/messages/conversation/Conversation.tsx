@@ -33,7 +33,6 @@ const Conversation: FC<ConversationProps> = ({
   const router = useRouter();
   const hasMarkedRead = useRef(false);
 
-  // ✅ Evita loops de render
   useEffect(() => {
     if (!hasMarkedRead.current) {
       markAsRead(conversationId);
@@ -46,14 +45,13 @@ const Conversation: FC<ConversationProps> = ({
   };
 
   return (
-    <div className="flex flex-col w-full h-full bg-white dark:bg-gray-900 rounded-xl shadow-lg overflow-hidden">
-      {/* 🔹 Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+    <div className="flex flex-col w-full h-full bg-white dark:bg-gray-900 overflow-hidden">
+      {/* Header */}
+      <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
         <button
           type="button"
           onClick={handleGoToProfile}
-          onKeyDown={(e) => e.key === "Enter" && handleGoToProfile()}
-          className="text-lg font-bold text-left cursor-pointer hover:text-blue-500 transition-colors bg-transparent border-none focus:outline-none focus:ring-2 focus:ring-blue-400 dark:focus:ring-blue-500"
+          className="text-xl font-semibold text-left cursor-pointer hover:text-blue-500 transition-colors"
         >
           {conversationName}
         </button>
@@ -61,15 +59,16 @@ const Conversation: FC<ConversationProps> = ({
         <button
           type="button"
           onClick={onClose}
-          className="text-gray-500 hover:text-red-500 transition-colors focus:outline-none focus:ring-2 focus:ring-red-400 dark:focus:ring-red-600 rounded-full p-1"
-          aria-label="Cerrar conversación"
+          className=" cursor-pointer text-gray-500 hover:text-red-500 transition-colors rounded-full p-2"
         >
-          <FaTimes />
+          <FaTimes size={20} />
         </button>
       </div>
 
-      {/* 🔹 Contenido */}
-      <ConversationView messages={messages} sendMessage={sendMessage} />
+      {/* Mensajes + input */}
+      <div className="flex-1 flex flex-col">
+        <ConversationView messages={messages} sendMessage={sendMessage} />
+      </div>
     </div>
   );
 };
