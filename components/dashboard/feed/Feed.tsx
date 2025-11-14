@@ -1,24 +1,54 @@
 "use client";
 
+import { Tweet } from "../tweet";
+import { Tweet as TweetType } from "../../../types/tweet";
+
 export default function Feed() {
-  const tweets = [
-    { user: "elonmusk", content: "Starship flight test successful 🚀" },
+  const tweets: TweetType[] = [
     {
-      user: "fran_barros",
+      id: "1",
+      user: {
+        id: "u1",
+        name: "Elon Musk",
+        username: "elonmusk",
+        avatar: "/elon.jpg",
+      },
+      content: "Starship flight test successful 🚀",
+      createdAt: "2025-02-01T10:00:00Z",
+      media: [],
+      stats: {
+        likes: 120000,
+        retweets: 45000,
+        replies: 5500,
+      },
+      isLiked: false,
+      isRetweeted: false,
+    },
+    {
+      id: "2",
+      user: {
+        id: "u2",
+        name: "Fran Barros",
+        username: "fran_barros",
+        avatar: "/fran.jpg",
+      },
       content: "Construyendo un clon de Twitter con Next.js 💻",
+      createdAt: "2025-02-01T12:00:00Z",
+      media: [],
+      stats: {
+        likes: 150,
+        retweets: 30,
+        replies: 5,
+      },
+      isLiked: false,
+      isRetweeted: false,
     },
   ];
 
   return (
     <div className="space-y-4">
-      {tweets.map((t, i) => (
-        <div
-          key={i}
-          className="p-4 bg-white dark:bg-gray-800 rounded-2xl shadow"
-        >
-          <p className="font-semibold">@{t.user}</p>
-          <p className="text-gray-700 dark:text-gray-300">{t.content}</p>
-        </div>
+      {tweets.map((tweet) => (
+        <Tweet key={tweet.id} data={tweet} />
       ))}
     </div>
   );

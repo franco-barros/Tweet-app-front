@@ -9,10 +9,16 @@ import { SuggestionsPanel } from "./suggestionspanel";
 export default function Dashboard() {
   const userName = "fran_barros";
 
+  const handlePost = (tweet: string) => {
+    console.log("Nuevo tweet:", tweet);
+  };
+
   return (
     <div className="p-6 lg:p-10 space-y-8 bg-gray-50 dark:bg-gray-900 min-h-screen">
       <DashboardHeader name={userName} />
-      <TweetComposer />
+
+      {/* ⬇️ ahora sí pasamos onPost */}
+      <TweetComposer onPost={handlePost} />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-6">

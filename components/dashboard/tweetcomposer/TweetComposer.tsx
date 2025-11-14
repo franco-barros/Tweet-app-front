@@ -2,24 +2,28 @@
 
 import { useState } from "react";
 
-export default function TweetComposer() {
+export default function TweetComposer({
+  onPost,
+}: Readonly<{
+  onPost: (tweet: string) => void;
+}>) {
   const [tweet, setTweet] = useState("");
 
   const handlePost = () => {
     if (!tweet.trim()) return;
-    console.log("Tweet enviado:", tweet);
+    onPost(tweet);
     setTweet("");
   };
 
   return (
-    <div className="p-4 bg-white dark:bg-gray-800 rounded-2xl shadow">
+    <div className="p-4 bg-white dark:bg-gray-800 rounded-2xl shadow ">
       <textarea
         value={tweet}
         onChange={(e) => setTweet(e.target.value)}
         placeholder="¿Qué está pasando?"
         className="w-full bg-transparent text-gray-800 dark:text-gray-100 resize-none outline-none min-h-20"
       />
-      <div className="flex justify-end mt-3">
+      <div className="flex justify-end mt-3 ">
         <button
           onClick={handlePost}
           disabled={!tweet.trim()}
