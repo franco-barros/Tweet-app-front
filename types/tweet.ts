@@ -17,6 +17,8 @@ export interface Tweet {
   content: string;
   createdAt: string;
   media?: TweetMedia[];
+  parentId?: string | null;
+  replies?: Tweet[];
   stats: {
     likes: number;
     retweets: number;

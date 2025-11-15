@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { Tweet as TweetType } from "@/types/tweet";
 import { UserAvatar } from "../useravatar";
 import { TweetMedia } from "../tweetmedia";
@@ -26,22 +27,24 @@ export default function Tweet({
   });
 
   return (
-    <div className="p-4 bg-white dark:bg-gray-800 rounded-2xl shadow flex gap-3">
-      {/* Avatar — clickeable */}
-      <div className="cursor-pointer">
+    <Link
+      href={`/tweet/${data.id}`}
+      className=" p-4 bg-white dark:bg-gray-800 rounded-2xl shadow flex gap-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition"
+    >
+      {/* Avatar */}
+      <div>
         <UserAvatar user={user} size={46} />
       </div>
 
       {/* Contenido */}
       <div className="flex-1">
+        {/* Encabezado */}
         <div className="flex items-center gap-2 text-sm">
-          {/* Nombre — clickeable */}
-          <span className="font-semibold text-gray-900 dark:text-gray-100 cursor-pointer">
+          <span className="font-semibold text-gray-900 dark:text-gray-100">
             {user.name}
           </span>
 
-          {/* Username — clickeable */}
-          <span className="text-gray-500 cursor-pointer">@{user.username}</span>
+          <span className="text-gray-500">@{user.username}</span>
 
           <span className="text-gray-400">·</span>
           <span className="text-gray-500">{date}</span>
@@ -55,7 +58,7 @@ export default function Tweet({
         {/* Media */}
         {media && media.length > 0 && <TweetMedia media={media} />}
 
-        {/* Acciones — ya tienen cursor-pointer */}
+        {/* Acciones */}
         <TweetActions
           tweet={data}
           onLike={onLike}
@@ -63,6 +66,6 @@ export default function Tweet({
           onRetweet={onRetweet}
         />
       </div>
-    </div>
+    </Link>
   );
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { DashboardHeader } from "./dashboardheader";
-import { TweetComposer } from "./tweetcomposer";
+import { TweetComposer } from "../ui/tweetcomposer";
 import { Feed } from "./feed";
 import { TrendsPanel } from "./trendspanel";
 import { SuggestionsPanel } from "./suggestionspanel";

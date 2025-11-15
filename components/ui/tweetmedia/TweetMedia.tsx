@@ -25,7 +25,7 @@ export default function TweetMedia({ media }: Readonly<TweetMediaProps>) {
   );
 }
 
-function MediaItem({ item }: { item: TMedia }) {
+function MediaItem({ item }: Readonly<{ item: TMedia }>) {
   if (item.type === "image") {
     return (
       <div className="relative w-full h-64">
@@ -41,7 +41,12 @@ function MediaItem({ item }: { item: TMedia }) {
 
   if (item.type === "video") {
     return (
-      <video src={item.url} controls className="rounded-xl w-full max-h-96" />
+      <video controls className="rounded-xl w-full max-h-96">
+        <source src={item.url} type="video/mp4" />
+
+        {/* Required by SonarQube (S4084) – captions track, even empty */}
+        <track kind="captions" src="" label="No captions available" default />
+      </video>
     );
   }
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { Tweet } from "../tweet";
+import { Tweet } from "../../ui/tweet";
 import { Tweet as TweetType } from "../../../types/tweet";
 
 export default function Feed() {
